@@ -294,19 +294,47 @@ bool WriteOVOX(std::string filePath, std::unique_ptr<VoxelContainer> Container)
 	//Frame Size
 	File.write((char*)&Container->m_FrameSize.x, 12);
 
+	//voxel Size
+	size_t vSize = (uint32_t)Container->m_Voxels.size();
+	File.write((char*)&vSize, 4);
 
 	//Palette Size
-	size_t pSize = Container->m_Palette.size();
-	File.write((char*)&pSize, sizeof(size_t));
+	size_t pSize = (uint32_t)Container->m_Palette.size();
+	File.write((char*)&pSize, 4);
 
+	
 	//--------DATA--------//
-	//Voxel Buffer
-	File.write((char*)&Container->m_Voxels[0], sizeof(Voxel)*Container->m_Voxels.size());
+
+	//--Voxel Buffer--//
+	//
+	//Loop through each variavble in the stuct to avoid trasmitting 
+	//garbage bytes used for alignment
+	for (int i = 0; i < Container->m_Voxels.size(); ++i)
+	{
+		File.write((char*)&Container->m_Voxels[i].m_Position.x, 4);
+		File.write((char*)&Container->m_Voxels[i].m_Position.y, 4);
+		File.write((char*)&Container->m_Voxels[i].m_Position.z, 4);
+
+		File.write((char*)&Container->m_Voxels[i].m_Index, 2);
+	}
+
+
 
 	//Palette Buffer
-	File.write((char*)&Container->m_Palette[0], sizeof(Material)*Container->m_Palette.size());
+	for (int i = 0; i < Container->m_Palette.size(); ++i)
+	{
+
+		File.write((char*)&Container->m_Palette[i].m_Colour.x, 4);
+		File.write((char*)&Container->m_Palette[i].m_Colour.y, 4);
+		File.write((char*)&Container->m_Palette[i].m_Colour.z, 4);
+		File.write((char*)&Container->m_Palette[i].m_Colour.w, 4);
+
+		File.write((char*)&Container->m_Palette[i].m_Protperites.x, 4);
+		File.write((char*)&Container->m_Palette[i].m_Protperites.y, 4);
+		File.write((char*)&Container->m_Palette[i].m_Protperites.z, 4);
+	}
+
 
 	File.close();
-
 	return true;
 }
