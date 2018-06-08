@@ -258,6 +258,7 @@ std::unique_ptr<VoxelContainer> ConvertXRAW(std::string filePath)
 			break;
 		}
 
+		mat.m_Protperites = vec3(0, 255, 0);
 		Container->m_Palette.push_back(mat);
 	}
 
